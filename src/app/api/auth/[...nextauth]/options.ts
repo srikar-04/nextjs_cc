@@ -52,6 +52,30 @@ export const authOptions: NextAuthOptions = {
         // GoogleProvider(),
         // GitHubProvider()
     ],
+    callbacks: {
+        // -->> the use here is "nextAuth's built in type" it has nothing to do with the User Interface that we have declared in the model <<--
+        async jwt({ token, user }) {
+            // dumping information inside token, so that we donot need to call db everytime
+            if(user) {  // this is the user that we are getting from db inside authorize callback inside credentialsProvoder
+                token._id = user._id?.toString()
+                token.username = user.username
+                token.isAcceptingMessage = user.isAcceptingMessage
+                token.isVerified = user.isVerified
+            }
+            return token
+        },
+        async session({ session, token }) {
+
+            if(token) {
+                session.user._id = token._id
+                session.user.username  = token.username
+                session.user.isAcceptingMessage = token.isAcceptingMessage
+                session.user.isVerified = token.isVerified
+            }
+           
+            return session
+        },
+    },
     pages: {
         signIn: '/sign-in'
     },
