@@ -40,7 +40,7 @@ export async function POST(request: Request) {
             } else {
                 return Response.json({
                     success: false,
-                    message: 'User already signed up'
+                    message: 'User already signed up, account already exsists with this email'
                 },{status: 400})
             }
 

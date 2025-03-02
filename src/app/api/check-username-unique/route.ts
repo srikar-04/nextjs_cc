@@ -29,10 +29,8 @@ export async function GET(request: Request)  {  // this "Request" is predefinied
         }
 
         const { username } = result.data // this data contains the username ->> check zod docs while using safeParse
-        console.log(username, 'username');
 
         const exsistingVerifiedUser = await UserModel.findOne({username, isVerified: true})
-        console.log(exsistingVerifiedUser, 'exsisting user from database');
         
 
         if(exsistingVerifiedUser) {
