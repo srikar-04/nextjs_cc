@@ -54,8 +54,9 @@ function page(request: Request) {
 
   return (
     <div className='w-full h-screen flex items-center justify-center'>
-        <form onSubmit={(e) => handlesubmit(e)} className='p-4 space-y-4 space-x-4 shadow-lg'>
+        <form onSubmit={(e) => handlesubmit(e)} className='p-8 space-y-2 space-x-4 shadow-lg rounded-lg'>
             <Toaster richColors />
+            <div className='text-center text-2xl font-bold mb-8'>Verify Your Account</div>
             <InputOTP 
                 maxLength={6} 
                 pattern={REGEXP_ONLY_DIGITS_AND_CHARS}
@@ -74,7 +75,7 @@ function page(request: Request) {
             <div className='text-center text-sm'>
                 Enter Verification Code
             </div>
-            <Button className='mt-4' type='submit'>
+            <Button className='mt-5' type='submit'>
                 {loading ? <span className='flex items-center'> <Loader2 className='mr-2 animate-spin' /> Loading...</span> : 'verify' }
             </Button>
         </form>
