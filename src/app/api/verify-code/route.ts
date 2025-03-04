@@ -8,7 +8,7 @@ export async function POST(request: Request) {
         const { username, code }: {username: string, code: string} = await request.json();
 
         const decodedUsername = decodeURIComponent(username)
-
+        console.log(decodedUsername, 'username in backend');
         const user = await UserModel.findOne({username: decodedUsername})
 
         if(!user) {
@@ -45,7 +45,7 @@ export async function POST(request: Request) {
         
     } catch (error) {
         console.error('Error verifiying code',error);
-        Response.json({
+        return Response.json({
             success: false,
             message: 'Failed to verify code'
         }, {status: 500})
