@@ -9,6 +9,7 @@ import { useParams, useRouter } from 'next/navigation'
 import React, { useState } from 'react'
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
+import { verifySchema } from '@/schemas/verifySchema';
 // the "square bracket" folder structure is used whenever we are accepting dynamic data in nextjs
 function page(request: Request) {
 
@@ -16,7 +17,7 @@ function page(request: Request) {
     const router = useRouter();
     const [loading, setLoading] = useState(false)
 
-    const params = useParams()
+    const params = useParams<{username: string}>()
     const username = params.username as string
 
     console.log(username, 'username from url');
@@ -26,6 +27,13 @@ function page(request: Request) {
         e.preventDefault(); 
         try {
             setLoading(true)
+            const validationResult = verifySchema.safeParse({ code: otpValue });
+            if (!validationResult.success) {
+                // If validation fails, extract the first error message and display it.
+                const errorMessage = validationResult.error.errors[0].message;
+                toast.error(errorMessage);
+                return;
+            }
             const response = await axios.post<ApiResponse>('/api/verify-code', {username, code: otpValue.toString()})
 
             if(response?.data?.success) {
@@ -66,7 +74,7 @@ function page(request: Request) {
             <div className='text-center text-sm'>
                 Enter Verification Code
             </div>
-            <Button type='submit'>
+            <Button className='mt-4' type='submit'>
                 {loading ? <span className='flex items-center'> <Loader2 className='mr-2 animate-spin' /> Loading...</span> : 'verify' }
             </Button>
         </form>
