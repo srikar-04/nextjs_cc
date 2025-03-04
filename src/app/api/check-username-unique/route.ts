@@ -2,6 +2,7 @@ import { z } from "zod";
 import UserModel from "@/models/User.models";
 import dbConnect from "@/lib/dbConnect";
 import { usernameValidation } from "@/schemas/signUpSchema";
+import { error } from "console";
 
 const UsernameQuerySchema = z.object({
     username: usernameValidation
@@ -35,13 +36,14 @@ export async function GET(request: Request)  {  // this "Request" is predefinied
         if(exsistingVerifiedUser) {
             return Response.json({
                 success: false,
-                message: 'Username is already taken'
+                message: 'username already taken',
+                error: 'username already taken'
             }, {status: 400})
         }
 
         return Response.json({
             success: true,
-            message: 'Username is unique'
+            message: 'username is unique'
         })
         
     } catch (error) {
