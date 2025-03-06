@@ -45,8 +45,9 @@ const page = () => {
       console.log(result, 'result in sign-in page');
       if(result?.error) {
         toast.error(result.error)
+      } else {
+        toast.info('sign-in successful')
       }
-      toast.info('sign-in successful')
       setIsSubmitting(false)
       if(result?.url) {
         router.replace('/dashboard')

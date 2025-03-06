@@ -20,7 +20,7 @@ function page(request: Request) {
     const params = useParams<{username: string}>()
     const username = params.username as string
 
-    console.log(username, 'username from url');
+    // console.log(username, 'username from url');
 
 
     const handlesubmit = async (e: React.FormEvent) => {
