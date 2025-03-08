@@ -23,14 +23,15 @@ import { ApiResponse } from "@/types/ApiResponse";
 
 function page() {
   const { status } = useSession();
-  const [inputValue, setInputValue] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-
   const params = useParams<{ username: string }>();
   const username = params.username as string;
 
-  const form = useForm({
-    resolver: zodResolver<z.infer<typeof messagesSchema>>(messagesSchema),
+  const form = useForm<z.infer<typeof messagesSchema>>({
+    resolver: zodResolver(messagesSchema),
+    defaultValues: {
+      content: ''
+    }
   });
 
   const onSubmit = async (data: z.infer<typeof messagesSchema>) => {
@@ -40,31 +41,38 @@ function page() {
 
       if(!AcceptResponse?.data?.isAcceptingMessage) {
         toast.error('User is not accepting messages')
-        setInputValue('')
         form.reset()
         return
       }
 
-      const response = await axios.post<ApiResponse>("/api/send-message", {username, content: data.content});
+      const response = await axios.post<ApiResponse>("/api/send-message", {
+        username, 
+        content: data.content
+      });
 
       if(response?.data?.success) {
-        toast.info(response?.data?.message || 'succesfully sent anonymus message')
+        toast.info(response?.data?.message || 'Successfully sent anonymous message')
+        form.reset()
       } else {
-        toast.info(response?.data?.message || 'failed to send message')
+        toast.info(response?.data?.message || 'Failed to send message')
       }
-      form.reset()
     } catch (error) {
-      console.log(error, 'error while sending anonymus message');
-      const AxiosError = error as AxiosError<ApiResponse>
-      toast.error(AxiosError?.response?.data?.message || 'error while sending anonymus message')
-      form.reset()
+      const axiosError = error as AxiosError<ApiResponse>
+      toast.error(axiosError?.response?.data?.message || 'Error while sending anonymous message')
     } finally {
-      setInputValue('')
       setIsSubmitting(false)
-      form.reset()
     }
   };
 
+  const handleSuggestMessages = async () => {
+    try {
+      console.log('hello world')
+    } catch (error) {
+      const AxiosError = error as AxiosError<ApiResponse>
+      console.error('Error while getting message suggestions : ', AxiosError);
+      toast.error(AxiosError?.response?.data?.message || 'Error while getting message suggestions')
+    }
+  }
 
   if (status === "loading") {
     return (
@@ -84,7 +92,7 @@ function page() {
       <main className="w-full h-screen flex flex-col gap-8 container mx-auto items-center mt-10">
         <h1 className="font-bold text-5xl ">Public Profile Link</h1>
 
-        <div className="w-full p-4 border border-red-500">
+        <div className="w-full p-8">
           <h1 className="font-semibold mb-0.5">Send Anonymus Messages to @{username}</h1>
           <Toaster richColors />
           <Form {...form}>
@@ -101,19 +109,18 @@ function page() {
                       <Input
                         autoComplete="off"
                         className="w-full h-16"
-                        placeholder="Type your anonymus message here..."
+                        placeholder="Type your anonymous message here..."
                         {...field}
-                        onChange={(e) => {
-                          field.onChange(e);
-                          setInputValue(e.target.value);
-                        }}
                       />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-            <Button type="submit" disabled={inputValue === ""}>
+            <Button 
+              type="submit" 
+              disabled={!form.watch('content') || isSubmitting}
+            >
               {isSubmitting ? (
                 <>
                   <Loader2 className="mr-2 h-4 w-4 animate-spin" /> Loading...
@@ -126,8 +133,8 @@ function page() {
           </Form>
         </div>
 
-        <div className="w-full mt-6 border border-red-500">
-          test
+        <div className="w-full mt-6 p-8 border border-red-500">
+          <Button onClick={() => handleSuggestMessages()}>Suggest Messages</Button>
         </div>
       </main>
     </>

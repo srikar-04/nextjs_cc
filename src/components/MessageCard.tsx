@@ -36,7 +36,6 @@ function MessageCard({ message, onMessageDelete }: MessageCardProp) {
   const handleDeleteConfirm = async () => {
     try {
       const response = await axios.delete<ApiResponse>(`/api/delete-message/${message._id}`);
-      console.log(response, 'response||||||||||||||||||||||||||||')
       if(response?.data.success) toast.info(response?.data.message || 'successfully deleted message')
       onMessageDelete(message._id)
     } catch (error) {
@@ -45,34 +44,40 @@ function MessageCard({ message, onMessageDelete }: MessageCardProp) {
     }
   }
   return (
-    <Card className="border ">
-    <div className="flex items-center justify-between w-full p-4">
-      <CardContent className="p-0 flex-1">
-        {message?.content}
-      </CardContent>
-      
-      <div className="ml-4">
-        <AlertDialog>
-          <AlertDialogTrigger asChild>
-            <Button variant="destructive"><X className="w-10 h-6" /></Button>
-          </AlertDialogTrigger>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-              <AlertDialogDescription>
-                This action cannot be undone. This will permanently delete your
-                response and remove your data from our servers.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction onClick={handleDeleteConfirm}>Continue</AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+    <Card className="w-full">
+      <div className="flex items-start justify-between p-4 gap-2">
+        <CardContent className="p-0 flex-1 min-w-0">
+          <p className="break-words pr-2 text-sm">{message?.content}</p>
+        </CardContent>
+        
+        <div className="flex-none">
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button 
+                variant="destructive" 
+                size="icon" 
+                className="h-8 w-8 shrink-0"
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This action cannot be undone. This will permanently delete your
+                  response and remove your data from our servers.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={handleDeleteConfirm}>Continue</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
       </div>
-    </div>
-  </Card>
+    </Card>
   );
 }
 
