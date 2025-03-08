@@ -18,6 +18,8 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import axios, { AxiosError } from "axios";
+import { ApiResponse } from "@/types/ApiResponse";
 
 function page() {
   const { status } = useSession();
@@ -39,6 +41,7 @@ function page() {
       if(!AcceptResponse?.data?.isAcceptingMessage) {
         toast.error('User is not accepting messages')
         setInputValue('')
+        form.reset()
         return
       }
 
@@ -49,14 +52,16 @@ function page() {
       } else {
         toast.info(response?.data?.message || 'failed to send message')
       }
-      
+      form.reset()
     } catch (error) {
       console.log(error, 'error while sending anonymus message');
       const AxiosError = error as AxiosError<ApiResponse>
       toast.error(AxiosError?.response?.data?.message || 'error while sending anonymus message')
+      form.reset()
     } finally {
       setInputValue('')
       setIsSubmitting(false)
+      form.reset()
     }
   };
 
@@ -128,8 +133,5 @@ function page() {
     </>
   );
 }
-import axios, { AxiosError } from "axios";
-import { ApiResponse } from "@/types/ApiResponse";
-import { log } from "node:console";
 
 export default page;

@@ -16,6 +16,5 @@ import { authOptions } from "./options";
 
 const handler = NextAuth(authOptions);
 
-console.log(handler, 'this is handler from auth/[...nextauth] file');
 
 export {handler as GET, handler as POST}
