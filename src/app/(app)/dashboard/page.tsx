@@ -29,6 +29,16 @@ function DashboardPage() {
   }
 
   const {data: session, status} = useSession()
+  const [profileUrl, setProfileUrl] = useState("")
+
+
+  useEffect(() => {
+    if (session?.user?.username) {
+      const username = session.user.username;
+      const baseUrl = `${window.location.protocol}//${window.location.host}`;
+      setProfileUrl(`${baseUrl}/u/${username}`);
+    }
+  }, [session]);
 
   const form = useForm({
     resolver: zodResolver<z.infer<typeof acceptMessagesSchema>>(acceptMessagesSchema),
@@ -62,10 +72,6 @@ function DashboardPage() {
     try {
       const response = await axios.get<ApiResponse>('/api/get-messages')
       setMessages(response?.data?.messages || [])
-      const UserMessages = messages
-      if(!UserMessages || UserMessages.length === 0) {
-        toast.info('No messages found')
-      }
     } catch (error) {
       const AxiosError = error as AxiosError<ApiResponse>
       console.log(AxiosError, 'error in fetch messages');
@@ -75,6 +81,9 @@ function DashboardPage() {
       setSwitchLoading(false)
     }
   }, [setLoading, setMessages])
+
+  console.log(messages, 'messages-----------------------');
+  
 
   useEffect( () => {
     if(!session || !session?.user) return
@@ -96,8 +105,6 @@ function DashboardPage() {
   const user: User = session?.user
   const username = user?.username
   
-  const baseUrl = `${window.location.protocol}//${window.location.host}`
-  const profileUrl = `${baseUrl}/u/${username}`
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(profileUrl)
@@ -177,9 +184,9 @@ function DashboardPage() {
           {messages.length > 0 ? (
             messages.map((message) => (
               <MessageCard 
-                key={message.id}
+                key={message._id}
                 message={message}
-                onMessageDelete={handleDeleteMessage}
+                onMessageDelete={() => handleDeleteMessage(message._id)}
               />
             ))
           )

@@ -25,6 +25,7 @@ import { X } from "lucide-react";
 import { Message } from "@/models/User.models";
 import axios, { AxiosError } from "axios";
 import { ApiResponse } from "@/types/ApiResponse";
+import { toast } from "sonner";
 
 type MessageCardProp = {
   message: Message,
@@ -32,23 +33,28 @@ type MessageCardProp = {
 }
 
 function MessageCard({ message, onMessageDelete }: MessageCardProp) {
-    const handleDeleteConfirm = async () => {
-        try {
-            const response = await axios.delete<ApiResponse>(`/api/delete-message/${message._id}`);
-
-            // onMessageDelete(message._id)
-        } catch (error) {
-         let axiosError = error as AxiosError<ApiResponse>
-         console.error(axiosError, 'error while deleting message');   
-        }
+  const handleDeleteConfirm = async () => {
+    try {
+      const response = await axios.delete<ApiResponse>(`/api/delete-message/${message._id}`);
+      console.log(response, 'response||||||||||||||||||||||||||||')
+      if(response?.data.success) toast.info(response?.data.message || 'successfully deleted message')
+      onMessageDelete(message._id)
+    } catch (error) {
+      let axiosError = error as AxiosError<ApiResponse>
+      console.error(axiosError, 'error while deleting message');   
     }
+  }
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Card Title</CardTitle>
+    <Card className="border ">
+    <div className="flex items-center justify-between w-full p-4">
+      <CardContent className="p-0 flex-1">
+        {message?.content}
+      </CardContent>
+      
+      <div className="ml-4">
         <AlertDialog>
           <AlertDialogTrigger asChild>
-            <Button variant="destructive"><X className="w-5 h-5" /></Button>
+            <Button variant="destructive"><X className="w-10 h-6" /></Button>
           </AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>
@@ -64,10 +70,9 @@ function MessageCard({ message, onMessageDelete }: MessageCardProp) {
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
-        <CardDescription>Card Description</CardDescription>
-      </CardHeader>
-      <CardContent></CardContent>
-    </Card>
+      </div>
+    </div>
+  </Card>
   );
 }
 

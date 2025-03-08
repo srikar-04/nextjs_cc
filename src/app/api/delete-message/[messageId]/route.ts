@@ -3,19 +3,15 @@ import UserModel from "@/models/User.models";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../auth/[...nextauth]/options";
 import { User } from "next-auth";
-import Router, { useRouter } from "next/router";
-import { useParams } from "next/navigation";
 import { ApiResponse } from "@/types/ApiResponse";
 import { AxiosError } from "axios";
+import mongoose from "mongoose";
 
-export async function DELETE(req: Request) {
+export async function DELETE(req: Request, { params }: { params: { messageId: string }}) {
 
-    const params = useParams<{messageId: string}>();
-    const messageId = params.messageId
-
+    const messageId = params.messageId; 
+    const messageObjectId = new mongoose.Types.ObjectId(messageId)
     await dbConnect();
-
-    console.log(messageId, 'messageId from delete route');
 
     const session = await getServerSession(authOptions);
 
@@ -32,10 +28,12 @@ export async function DELETE(req: Request) {
 
         const updatedResult = await UserModel.updateOne(
             {id: user._id},
-            {$pull: {messages: {_id: messageId}}}
+            {$pull: {messages: {_id: messageObjectId}}}
         )
 
-        if(updatedResult.modifiedCount == 0) {
+        console.log(updatedResult, 'Updated Result------------');
+        
+        if(updatedResult.modifiedCount === 0) {
             return Response.json({
                 success: false,
                 message: "Message not found or already deleted, in deleting message route",
