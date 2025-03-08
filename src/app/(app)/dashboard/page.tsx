@@ -16,6 +16,7 @@ import { Button } from '@/components/ui/button'
 import { Switch } from '@/components/ui/switch'
 import { Separator } from '@/components/ui/separator'
 import MessageCard from '@/components/MessageCard'
+import { User } from 'next-auth'
 
 function DashboardPage() {
   const [messages, setMessages] = useState<Message[]>([])
@@ -48,7 +49,8 @@ function DashboardPage() {
       setValue("acceptMessages", !!response?.data?.isAcceptingMessage)
     } catch (error) {
       const AxiosError = error as AxiosError<ApiResponse>
-      toast.error(AxiosError?.response?.data?.message)
+      toast.error(AxiosError?.response?.data?.message || 'error accepting messages')
+      console.log(AxiosError, 'error in fetch accept messages');
     } finally {
       setSwitchLoading(false)
     }
@@ -60,9 +62,14 @@ function DashboardPage() {
     try {
       const response = await axios.get<ApiResponse>('/api/get-messages')
       setMessages(response?.data?.messages || [])
+      const UserMessages = messages
+      if(!UserMessages || UserMessages.length === 0) {
+        toast.info('No messages found')
+      }
     } catch (error) {
       const AxiosError = error as AxiosError<ApiResponse>
-      toast.error(AxiosError?.response?.data?.message)
+      console.log(AxiosError, 'error in fetch messages');
+      toast.error(AxiosError?.response?.data?.message || 'error getting messages')
     }  finally {
       setLoading(false)
       setSwitchLoading(false)
@@ -86,7 +93,9 @@ function DashboardPage() {
     }
   }
 
-  const {username} = session?.user
+  const user: User = session?.user
+  const username = user?.username
+  
   const baseUrl = `${window.location.protocol}//${window.location.host}`
   const profileUrl = `${baseUrl}/u/${username}`
 
@@ -99,7 +108,7 @@ function DashboardPage() {
     return (
       <>
         <div className='w-full h-screen flex items-center justify-center'>
-          <Loader2 className='animate-spin h-16 w-16' style={{ animationDuration: "0.3s" }} strokeWidth={0.5}/>
+          <Loader2 className='animate-spin h-6 w-6' style={{ animationDuration: "0.3s" }} strokeWidth={1}/>
         </div>
       </>
     )

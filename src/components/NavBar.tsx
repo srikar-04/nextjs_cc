@@ -16,7 +16,7 @@ function NavBar() {
         return (
             <>
                 <div className='w-full h-screen flex items-center justify-center'>
-                    <Loader2 className='animate-spin h-16 w-16' style={{ animationDuration: "0.3s" }} strokeWidth={0.5}/>
+                    <Loader2 className='animate-spin h-16 w-16' style={{ animationDuration: "0.3s" }} strokeWidth={1}/>
                 </div>
             </>
         )
